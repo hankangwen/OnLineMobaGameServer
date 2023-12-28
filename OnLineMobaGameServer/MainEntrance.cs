@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace OnLineMobaGameServer
 {
-    class Program
+    public class MainEntrance
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            NetManager.Connect("127.0.0.1", 8888);
         }
     }
 }
