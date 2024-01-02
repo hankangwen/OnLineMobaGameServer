@@ -126,8 +126,74 @@ public static class NetManager
         readBuffer.MoveBytes();
     }
 
+    /// <summary>
+    /// 处理消息
+    /// </summary>
+    /// <param name="state">客户端对象</param>
     private static void OnReveiceData(ClientState state)
     {
+        ByteArray readBuffer = state.readBuffer;
+        byte[] bytes = readBuffer.bytes;
+        int readIndex = readBuffer.readIndex;
 
+        if (readBuffer.Length <= 2)
+            return;
+
+        //解析总长度
+        short length = (short)(bytes[readIndex + 1] * 256 + bytes[readIndex]);
+        //收到的消息没有解析出来的多
+        if (readBuffer.Length < length)
+            return;
+
+        readBuffer.readIndex += 2;
+
+        int nameCount = 0;
+        string protoName = MsgBase.DecodeName(readBuffer.bytes, readBuffer.readIndex, out nameCount);
+        if (protoName == "")
+        {
+            Console.WriteLine("OnReveiceData 失败，协议名为空");
+            return;
+        }
+        readBuffer.readIndex += nameCount;
+
+        int bodyLength = length - nameCount;
+        MsgBase msgBase = MsgBase.Decode(protoName, readBuffer.bytes, readBuffer.readIndex, bodyLength);
+        readBuffer.readIndex += bodyLength;
+        readBuffer.MoveBytes();
+
+        //todo Test
+        MsgTest msgTest = (MsgTest)msgBase;
+        Console.WriteLine(msgTest.protoName);
+        Send(state, msgTest);
+    }
+
+    /// <summary>
+    /// 发送消息
+    /// </summary>
+    /// <param name="state">客户端对象</param>
+    /// <param name="msgBase">消息</param>
+    public static void Send(ClientState state, MsgBase msgBase)
+    {
+        if (state == null || !state.socket.Connected)
+            return;
+
+        //编码
+        byte[] nameBytes = MsgBase.EncodeName(msgBase);
+        byte[] bodyBytes = MsgBase.Encode(msgBase);
+        int len = nameBytes.Length + bodyBytes.Length;
+        byte[] sendBytes = new byte[len + 2];
+        sendBytes[0] = (byte)(len % 256);
+        sendBytes[1] = (byte)(len / 256);
+        Array.Copy(nameBytes, 0, sendBytes, 2, nameBytes.Length);
+        Array.Copy(bodyBytes, 0, sendBytes, 2 + nameBytes.Length, bodyBytes.Length);
+
+        try
+        {
+            state.socket.Send(sendBytes, 0, sendBytes.Length, 0);
+        }
+        catch (SocketException e)
+        {
+            Console.WriteLine("Send 失败" + e.Message);
+        }
     }
 }
