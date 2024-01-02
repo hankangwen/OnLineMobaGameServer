@@ -160,11 +160,6 @@ public static class NetManager
         MsgBase msgBase = MsgBase.Decode(protoName, readBuffer.bytes, readBuffer.readIndex, bodyLength);
         readBuffer.readIndex += bodyLength;
         readBuffer.MoveBytes();
-
-        //todo Test
-        MsgTest msgTest = (MsgTest)msgBase;
-        Console.WriteLine(msgTest.protoName);
-        Send(state, msgTest);
     }
 
     /// <summary>

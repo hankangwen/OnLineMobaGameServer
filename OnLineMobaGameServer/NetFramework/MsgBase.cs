@@ -3,14 +3,6 @@ using System.Text;
 using Newtonsoft.Json;
 //#nullable disable
 
-public class MsgTest : MsgBase
-{
-    public MsgTest()
-    {
-        protoName = "MsgTest";
-    }
-}
-
 public class MsgBase
 {
     /// <summary>
