@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 
 public static class NetManager
 {
@@ -160,6 +161,24 @@ public static class NetManager
         MsgBase msgBase = MsgBase.Decode(protoName, readBuffer.bytes, readBuffer.readIndex, bodyLength);
         readBuffer.readIndex += bodyLength;
         readBuffer.MoveBytes();
+
+        //通过反射调用客户端发过来的协议对应的方法
+        MethodInfo mi = typeof(MsgHandler).GetMethod(protoName);
+        if (mi != null)
+        {
+            //要执行方法的参数
+            object[] o = { state, msgBase };
+            mi.Invoke(null, o);
+        }
+        else
+        {
+            Console.WriteLine("OnReceiveData 反射失败");
+        }
+
+        if(readBuffer.Length > 2)
+        {
+            OnReveiceData(state);
+        }
     }
 
     /// <summary>
@@ -190,5 +209,15 @@ public static class NetManager
         {
             Console.WriteLine("Send 失败" + e.Message);
         }
+    }
+
+    /// <summary>
+    /// 获取时间戳
+    /// </summary>
+    /// <returns></returns>
+    public static long GetTimeStamp()
+    {
+        TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        return Convert.ToInt64(ts.TotalSeconds);
     }
 }

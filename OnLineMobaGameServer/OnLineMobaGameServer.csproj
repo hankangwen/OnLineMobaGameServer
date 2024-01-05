@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MsgHandler.cs" />
+    <Compile Include="Msg\MsgPing.cs" />
+    <Compile Include="Msg\MsgPoing.cs" />
     <Compile Include="NetFramework\ByteArray.cs" />
     <Compile Include="NetFramework\ClientState.cs" />
     <Compile Include="NetFramework\MsgBase.cs" />
@@ -57,5 +60,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
