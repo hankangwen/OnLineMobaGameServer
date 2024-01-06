@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -224,8 +223,10 @@ public static class NetManager
         TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
         return Convert.ToInt64(ts.TotalSeconds);
     }
-
-
+    
+    /// <summary>
+    /// 心跳检测
+    /// </summary>
     private static void CheckPing()
     {
         foreach (ClientState state in states.Values)
