@@ -22,6 +22,8 @@ public static class NetManager
     /// </summary>
     public static List<Socket> sockets = new List<Socket>();
 
+    private static float _pingInterval = 30;
+
     /// <summary>
     /// 连接服务器
     /// </summary>
@@ -61,6 +63,7 @@ public static class NetManager
                     Receive(s);
                 }
             }
+            CheckPing();
         }
     }
 
@@ -78,6 +81,7 @@ public static class NetManager
             ClientState state = new ClientState();
             state.socket = socket;
 
+            state.lastPingTime = GetTimeStamp();
             states.Add(socket, state);
         }
         catch (SocketException e)
@@ -219,5 +223,30 @@ public static class NetManager
     {
         TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
         return Convert.ToInt64(ts.TotalSeconds);
+    }
+
+
+    private static void CheckPing()
+    {
+        foreach (ClientState state in states.Values)
+        {
+            if(GetTimeStamp() - state.lastPingTime > _pingInterval * 4)
+            {
+                Console.WriteLine("心跳机制，断开连接：", state.socket.RemoteEndPoint);
+                //关闭客户端
+                Close(state);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 关闭对应客户端
+    /// </summary>
+    /// <param name="state">客户端</param>
+    private static void Close(ClientState state)
+    {
+        state.socket.Close();
+        states.Remove(state.socket);
     }
 }

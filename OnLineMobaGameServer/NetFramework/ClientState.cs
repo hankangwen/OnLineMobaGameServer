@@ -20,5 +20,8 @@ public class ClientState
     /// </summary>
     public ByteArray readBuffer = new ByteArray();
 
+    /// <summary>
+    /// 上一次收到Ping的时间
+    /// </summary>
     public long lastPingTime = 0;
 }

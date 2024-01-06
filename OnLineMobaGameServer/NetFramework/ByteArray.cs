@@ -65,7 +65,7 @@ public class ByteArray
         initSize = defaultBytes.Length;
         capacity = defaultBytes.Length;
         readIndex = 0;
-        writeIndex = 0;
+        writeIndex = defaultBytes.Length;
     }
 
     /// <summary>
