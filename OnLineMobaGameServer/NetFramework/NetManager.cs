@@ -21,7 +21,7 @@ public static class NetManager
     /// </summary>
     public static List<Socket> sockets = new List<Socket>();
 
-    private static float _pingInterval = 30;
+    private static float _pingInterval = 2;
 
     /// <summary>
     /// 连接服务器

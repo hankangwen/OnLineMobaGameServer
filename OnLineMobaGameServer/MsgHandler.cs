@@ -11,7 +11,7 @@ public class MsgHandler
         Console.WriteLine("MsgPing:" + c.socket.RemoteEndPoint);
         c.lastPingTime = NetManager.GetTimeStamp();
         MsgPong msgPong = new MsgPong();
-        NetManager.Send(c, msgBase);
+        NetManager.Send(c, msgPong);
     }
 
 }
