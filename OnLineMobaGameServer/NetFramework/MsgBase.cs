@@ -50,8 +50,10 @@ public class MsgBase
         // bytes[0] = (byte)(len % 256);//0000 0001 0000 0001
         // bytes[1] = (byte)(len / 256);//0000 0000 1111 1111
         
-        bytes[0] = (byte)(len & 0xff);//0000 0001 0000 0001
-        bytes[1] = (byte)(len >> 8);//0000 0000 1111 1111
+        // TODO:此处高8位和低8位反过来存比较统一，即bytes0存高位，bytes1存低位，这样和网关那边的guid的长度编码一致
+        // 259 = 0000 0001 0000 0011
+        bytes[0] = (byte)(len & 0xff);//0000 0001 0000 0001 存低8位
+        bytes[1] = (byte)(len >> 8);//0000 0000 1111 1111   存高8位
         
         Array.Copy(nameBytes, 0, bytes, 2, len);
         return bytes;
