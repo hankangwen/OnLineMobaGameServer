@@ -80,7 +80,6 @@ public static partial class NetManager
         _writeQueue = new Queue<ByteArray>();
         _isConnecting = false;
         _isClosing = false;
-
     }
 
     /// <summary>
@@ -194,14 +193,21 @@ public static partial class NetManager
     /// </summary>
     private static void OnReceiveData()
     {
-        if (_byteArray.Length <= 2) return;
+        if (_byteArray.Length <= 2) 
+            return;
+
         byte[] bytes = _byteArray.bytes;
         int readIndex = _byteArray.readIndex;
         //解析消息总体长度
         short length = (short)(bytes[readIndex + 1] * 256 + bytes[readIndex]);
 
-        if (_byteArray.Length < length + 2) return;
-        _byteArray.readIndex += 2;
+        if (_byteArray.Length < length + 2) 
+            return;
+        uint guid = (uint)(bytes[readIndex + 2] << 24 |
+                    bytes[readIndex + 3] << 16 |
+                    bytes[readIndex + 4] << 8 |
+                    bytes[readIndex + 5]);
+        _byteArray.readIndex += 6;
         int nameCount = 0;
         string protoName = ProtobufTool.DecodeName(_byteArray.bytes, _byteArray.readIndex, out nameCount);
         if (protoName == "")
@@ -218,9 +224,16 @@ public static partial class NetManager
 
         //移动数据
         _byteArray.MoveBytes();
-        lock (_msgList)
+
+        MethodInfo mi = typeof(MsgHandler).GetMethod(protoName);
+        if (mi != null)
         {
-            _msgList.Add(msgBase);
+            object[] o = { guid, msgBase };
+            mi.Invoke(null, o);
+        }
+        else
+        {
+            Console.WriteLine("OnReceiveData fail");
         }
 
         if (_byteArray.Length > 2)
@@ -253,8 +266,8 @@ public static partial class NetManager
         sendBytes[3] = (byte)((guid >> 16) & 0xff);
         sendBytes[4] = (byte)((guid >> 8) & 0xff);
         sendBytes[5] = (byte)(guid & 0xff);
-        Array.Copy(nameBytes, 0, sendBytes, 3, nameBytes.Length);
-        Array.Copy(bodyBytes, 0, sendBytes, 3 + nameBytes.Length, bodyBytes.Length);
+        Array.Copy(nameBytes, 0, sendBytes, 6, nameBytes.Length);
+        Array.Copy(bodyBytes, 0, sendBytes, 6 + nameBytes.Length, bodyBytes.Length);
 
         _socket.BeginSend(sendBytes, 0, sendBytes.Length, SocketFlags.None, SendCallback, _socket);
     }

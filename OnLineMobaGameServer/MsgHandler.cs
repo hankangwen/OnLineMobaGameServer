@@ -10,10 +10,10 @@ public class MsgHandler
 {
     public static void MsgPing(ClientState c, IExtensible msgBase)
     {
-        Console.WriteLine("MsgPing:" + c.socket.RemoteEndPoint);
-        c.lastPingTime = NetManager.GetTimeStamp();
-        MsgPong msgPong = new MsgPong();
-        NetManager.Send(c, msgPong);
+        //Console.WriteLine("MsgPing:" + c.socket.RemoteEndPoint);
+        //c.lastPingTime = NetManager.GetTimeStamp();
+        //MsgPong msgPong = new MsgPong();
+        //NetManager.Send(c, msgPong);
     }
 
     //public static void MsgPing(ClientState c, MsgBase msgBase)
