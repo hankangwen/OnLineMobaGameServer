@@ -218,7 +218,7 @@ public static partial class NetManager
         _byteArray.readIndex += nameCount;
 
         //解析协议体
-        int bodyLength = length - nameCount;
+        int bodyLength = length - nameCount - 4;
         IExtensible msgBase = ProtobufTool.Decode(protoName, _byteArray.bytes, _byteArray.readIndex, bodyLength);
         _byteArray.readIndex += bodyLength;
 
@@ -258,7 +258,7 @@ public static partial class NetManager
         //编码
         byte[] nameBytes = ProtobufTool.EncodeName(msg);
         byte[] bodyBytes = ProtobufTool.Encode(msg);
-        int len = nameBytes.Length + bodyBytes.Length + 1;
+        int len = nameBytes.Length + bodyBytes.Length + 4;
         byte[] sendBytes = new byte[len + 2];
         sendBytes[0] = (byte)(len % 256);
         sendBytes[1] = (byte)(len / 256);

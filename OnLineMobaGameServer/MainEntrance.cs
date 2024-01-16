@@ -10,7 +10,8 @@ namespace OnLineMobaGameServer
     {
         public static void Main(string[] args)
         {
-            NetManager.Connect("127.0.0.1", 8888);
+            NetManager.Connect("127.0.0.1", 9000);
+            while (true) ;
         }
     }
 }
