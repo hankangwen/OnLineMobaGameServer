@@ -269,6 +269,7 @@ public static partial class NetManager
         Array.Copy(nameBytes, 0, sendBytes, 6, nameBytes.Length);
         Array.Copy(bodyBytes, 0, sendBytes, 6 + nameBytes.Length, bodyBytes.Length);
 
+        Console.WriteLine($"发送消息到网关，让网关转发给{guid}，msg:{msg.ToString()}");
         _socket.BeginSend(sendBytes, 0, sendBytes.Length, SocketFlags.None, SendCallback, _socket);
     }
 

@@ -18,7 +18,7 @@ public class MsgHandler
 
     public static void MsgTest(uint guid, IExtensible msgBase)
     {
-        Console.WriteLine($"guid:{guid}, MsgTest:{msgBase.ToString()}");
+        Console.WriteLine($"收到网关转发的消息，来自客户端guid:{guid}, MsgTest:{msgBase.ToString()}");
         NetManager.Send(msgBase, guid);
     }
 
