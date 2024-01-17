@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using ProtoBuf;
 using PBMessage;
+using System.Net;
 
 public static partial class NetManager
 {
@@ -69,6 +70,8 @@ public static partial class NetManager
     /// </summary>
     private static float _pingInterval = 2;
 
+    private static UdpClient _udpClient;
+
     /// <summary>
     /// 初始化
     /// </summary>
@@ -115,6 +118,10 @@ public static partial class NetManager
             Socket socket = (Socket)ar.AsyncState;
             socket.EndConnect(ar);
             Console.WriteLine("Connect Success!");
+
+            _udpClient = new UdpClient((IPEndPoint)socket.LocalEndPoint);
+            _udpClient.Connect((IPEndPoint)socket.RemoteEndPoint);
+            _udpClient.BeginReceive(ReceiveUdpCallback, null);
 
             _isConnecting = false;
 
@@ -285,4 +292,72 @@ public static partial class NetManager
 
         socket.EndSend(ar);
     }
+
+    #region udp
+
+    private static void ReceiveUdpCallback(IAsyncResult ar)
+    {
+        IPEndPoint iPEndPoint = new IPEndPoint(IPAddress.Any, 0);
+        byte[] receiveBuf = _udpClient.EndReceive(ar, ref iPEndPoint);
+
+        uint guid = (uint)(receiveBuf[0] << 24 |
+                    receiveBuf[1] << 16 |
+                    receiveBuf[2] << 8 |
+                    receiveBuf[3]);
+
+        int nameCount = 0;
+        string protoName = ProtobufTool.DecodeName(receiveBuf, 4, out nameCount);
+        if(protoName == "")
+        {
+            _udpClient.BeginReceive(ReceiveUdpCallback, null);
+            Console.WriteLine("解析失败");
+            return;
+        }
+
+        int bodyCount = receiveBuf.Length - nameCount - 4;
+        var msgBase = ProtobufTool.Decode(protoName, receiveBuf, 4 + nameCount, bodyCount);
+        if(msgBase == null)
+        {
+            _udpClient.BeginReceive(ReceiveUdpCallback, null);
+            return;
+        }
+
+        MethodInfo mi = typeof(MsgHandler).GetMethod(protoName);
+        if(mi != null)
+        {
+            object[] o = { guid, msgBase };
+            mi.Invoke(null, o);
+        }
+        else
+        {
+            Console.WriteLine("调用函数失败");
+        }
+        _udpClient.BeginReceive(ReceiveUdpCallback, null);
+    }
+
+    /// <summary>
+    /// udp发送
+    /// </summary>
+    /// <param name="msg">消息</param>
+    /// <param name="guid">客户端的guid</param>
+    public static void SendTo(IExtensible msg, uint guid)
+    {
+        //编码
+        byte[] nameBytes = ProtobufTool.EncodeName(msg);
+        byte[] bodyBytes = ProtobufTool.Encode(msg);
+        int len = nameBytes.Length + bodyBytes.Length + 4;
+        byte[] sendBytes = new byte[len];
+        //打包guid
+        sendBytes[0] = (byte)(guid >> 24);
+        sendBytes[1] = (byte)((guid >> 16) & 0xff);
+        sendBytes[2] = (byte)((guid >> 8) & 0xff);
+        sendBytes[3] = (byte)(guid & 0xff);
+        //拷贝到发送数组当中
+        Array.Copy(nameBytes, 0, sendBytes, 4, nameBytes.Length);
+        Array.Copy(bodyBytes, 0, sendBytes, 4 + nameBytes.Length, bodyBytes.Length);
+
+        _udpClient.Send(sendBytes, sendBytes.Length);
+    }
+
+    #endregion
 }
