@@ -94,12 +94,12 @@ public static partial class NetManager
     {
         if (_socket != null && _socket.Connected)
         {
-            Console.WriteLine("连接失败，已经连接过了");
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]连接失败，已经连接过了");
             return;
         }
         if (_isConnecting)
         {
-            Console.WriteLine("连接失败，正在连接中");
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]连接失败，正在连接中");
             return;
         }
         Init();
@@ -117,7 +117,7 @@ public static partial class NetManager
         {
             Socket socket = (Socket)ar.AsyncState;
             socket.EndConnect(ar);
-            Console.WriteLine("Connect Success!");
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]Connect Success!");
 
             _udpClient = new UdpClient((IPEndPoint)socket.LocalEndPoint);
             _udpClient.Connect((IPEndPoint)socket.RemoteEndPoint);
@@ -131,7 +131,7 @@ public static partial class NetManager
         }
         catch (SocketException e)
         {
-            Console.WriteLine("连接失败" + e.Message);
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]连接失败" + e.Message);
             _isConnecting = false;
         }
     }
@@ -170,7 +170,7 @@ public static partial class NetManager
         }
         catch (SocketException e)
         {
-            Console.WriteLine("接收失败" + e.Message);
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]接收失败" + e.Message);
         }
     }
 
@@ -219,7 +219,7 @@ public static partial class NetManager
         string protoName = ProtobufTool.DecodeName(_byteArray.bytes, _byteArray.readIndex, out nameCount);
         if (protoName == "")
         {
-            Console.WriteLine("协议名解析失败");
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]协议名解析失败");
             return;
         }
         _byteArray.readIndex += nameCount;
@@ -240,7 +240,7 @@ public static partial class NetManager
         }
         else
         {
-            Console.WriteLine("OnReceiveData fail");
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]OnReceiveData fail");
         }
 
         if (_byteArray.Length > 2)
@@ -276,7 +276,7 @@ public static partial class NetManager
         Array.Copy(nameBytes, 0, sendBytes, 6, nameBytes.Length);
         Array.Copy(bodyBytes, 0, sendBytes, 6 + nameBytes.Length, bodyBytes.Length);
 
-        Console.WriteLine($"发送消息到网关，让网关转发给{guid}，msg:{msg.ToString()}");
+        Console.WriteLine($"[{DateTime.Now.TimeOfDay}]发送消息到网关，让网关转发给{guid}，msg:{msg.ToString()}");
         _socket.BeginSend(sendBytes, 0, sendBytes.Length, SocketFlags.None, SendCallback, _socket);
     }
 
@@ -310,7 +310,7 @@ public static partial class NetManager
         if(protoName == "")
         {
             _udpClient.BeginReceive(ReceiveUdpCallback, null);
-            Console.WriteLine("解析失败");
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]解析失败");
             return;
         }
 
@@ -330,7 +330,7 @@ public static partial class NetManager
         }
         else
         {
-            Console.WriteLine("调用函数失败");
+            Console.WriteLine($"[{DateTime.Now.TimeOfDay}]调用函数失败");
         }
         _udpClient.BeginReceive(ReceiveUdpCallback, null);
     }
