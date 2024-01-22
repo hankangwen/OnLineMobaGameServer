@@ -77,6 +77,8 @@
     <Compile Include="NetFramework\NetManager.cs" />
     <Compile Include="MainEntrance.cs" />
     <Compile Include="NetFramework\ProtobufTool.cs" />
+    <Compile Include="Player\Player.cs" />
+    <Compile Include="Player\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="proto\MsgPing.cs" />
     <Compile Include="proto\MsgPong.cs" />
