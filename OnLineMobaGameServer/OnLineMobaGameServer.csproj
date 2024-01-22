@@ -68,11 +68,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Math\Fixed64.cs" />
+    <Compile Include="Math\Fixed64Vector2.cs" />
+    <Compile Include="Math\Fixed64Vector3.cs" />
     <Compile Include="MsgHandler.cs" />
+    <Compile Include="Msg\MsgLockStep.cs" />
+    <Compile Include="Msg\MsgLockStepBack.cs" />
     <Compile Include="Msg\MsgPing.cs" />
     <Compile Include="Msg\MsgPoing.cs" />
+    <Compile Include="Msg\Operation.cs" />
     <Compile Include="NetFramework\ByteArray.cs" />
     <Compile Include="NetFramework\ClientState.cs" />
+    <Compile Include="NetFramework\LockStepManager.cs" />
     <Compile Include="NetFramework\MsgBase.cs" />
     <Compile Include="NetFramework\NetManager.cs" />
     <Compile Include="MainEntrance.cs" />
@@ -80,9 +87,13 @@
     <Compile Include="Player\Player.cs" />
     <Compile Include="Player\PlayerManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="proto\MsgLockStep.cs" />
+    <Compile Include="proto\MsgLockStepBack.cs" />
     <Compile Include="proto\MsgPing.cs" />
     <Compile Include="proto\MsgPong.cs" />
     <Compile Include="proto\MsgTest.cs" />
+    <Compile Include="Room\Room.cs" />
+    <Compile Include="Room\RoomManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
