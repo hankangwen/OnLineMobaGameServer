@@ -78,7 +78,7 @@ namespace PBMessage
     public enum Operation
     {
             
-      [global::ProtoBuf.ProtoEnum(Name=@"Joystick", Value=0)]
+      [global::ProtoBuf.ProtoEnum(Name=@"Joystick")]
       Joystick = 0
     }
   
